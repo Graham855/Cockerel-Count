@@ -1,0 +1,63 @@
+{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang2057{\fonttbl{\f0\fnil\fcharset0 Calibri;}{\f1\fnil\fcharset1 Segoe UI Symbol;}{\f2\fnil Calibri;}}
+{\colortbl ;\red0\green0\blue255;}
+{\*\generator Riched20 10.0.19041}\viewkind4\uc1 
+\pard\sa200\sl276\slmult1\f0\fs22\lang9 <!DOCTYPE html>\par
+<html>\par
+<head>\par
+  <meta charset="UTF-8">\par
+  <title>Rooster Crow Counter</title>\par
+  <style>\par
+    body \{ font-family: Arial, sans-serif; text-align: center; margin-top: 50px; \}\par
+    h1 \{ font-size: 2.5em; \}\par
+    p \{ font-size: 1.2em; \}\par
+    #count \{ font-size: 2em; color: darkgreen; \}\par
+  </style>\par
+</head>\par
+<body>\par
+  <h1>\f1\u-10179?\u-9197?\f0  Rooster Crow Counter</h1>\par
+  <p>Status: <span id="status">Loading model...</span></p>\par
+  <p>Detected Class: <span id="label">None</span></p>\par
+  <p>Crow Count: <span id="count">0</span></p>\par
+\par
+  <script type="module">\par
+    import * as tmAudio from "{{\field{\*\fldinst{HYPERLINK https://cdn.jsdelivr.net/npm/@teachablemachine/audio@0.8.4/dist/audio.esm.js }}{\fldrslt{https://cdn.jsdelivr.net/npm/@teachablemachine/audio@0.8.4/dist/audio.esm.js\ul0\cf0}}}}\f0\fs22 ";\par
+\par
+    const URL = "{{\field{\*\fldinst{HYPERLINK https://teachablemachine.withgoogle.com/models/GpCg-BLX2/ }}{\fldrslt{https://teachablemachine.withgoogle.com/models/GpCg-BLX2/\ul0\cf0}}}}\f0\fs22 "; \par
+    const modelURL = URL + "model.json";\par
+    const metadataURL = URL + "metadata.json";\par
+\par
+    let model, recognizer;\par
+    let count = 0;\par
+    let lastDetectedTime = 0;\par
+\par
+    async function init() \{\par
+      model = await tmAudio.load(modelURL, metadataURL);\par
+      recognizer = new tmAudio.AudioRecognizer(model);\par
+      await recognizer.open();\par
+\par
+      document.getElementById("status").textContent = "Model Loaded \f2\emdash  Listening...";\par
+      recognizer.listen((result) => \{\par
+        const highest = result.scores.reduce((prev, score, idx) => \{\par
+          return score > prev.score ? \{score, idx\} : prev;\par
+        \}, \{score: -Infinity, idx: -1\});\par
+        const label = model.labels[highest.idx];\par
+\par
+        document.getElementById("label").textContent = label;\par
+        if (label === "Rooster Crow") \{\par
+          const now = Date.now();\par
+          // Avoid counting the same crow multiple times within 2 seconds\par
+          if (now - lastDetectedTime > 2000) \{\par
+            count++;\par
+            lastDetectedTime = now;\par
+            document.getElementById("count").textContent = count;\par
+          \}\par
+        \}\par
+      \});\par
+    \}\par
+\par
+    init();\par
+  </script>\par
+</body>\par
+</html>\f0\par
+}
+ 
